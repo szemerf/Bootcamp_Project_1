@@ -32,7 +32,7 @@ This document contains the following details:
 The main purpose of this network is to expose a load-balanced and monitored instance of DVWA, the D*mn Vulnerable Web Application.
 
 Load balancing ensures that the application will be highly __available__, in addition to restricting __access__ to the network.
-- Load balancers distribute configure IP traffic to a pool of back-end servers, in this case, TCP traffic on port 80 is distributed between healthy servers in our back-end pool which consists of the two web servers.  A jump box is designed to allow SSH traffic from a specific network (or in our case, a specific IP address) to limit the number of servers exposed to internet SSH traffic, thus lowering exposure to our ELK and Web Servers from outside attacks.
+- Load balancers distribute configured IP traffic to a pool of back-end servers, in this case, TCP traffic on port 80 is distributed between healthy servers in our back-end pool which consists of the two web servers.  A jump box is designed to allow SSH traffic from a specific network (or in our case, a specific IP address) to limit the number of servers exposed to internet SSH traffic, thus lowering exposure to our ELK and Web Servers from outside attacks.
 
 Integrating an ELK server allows users to easily monitor the vulnerable VMs for changes to the __configuration__ and system __logs__.
 - Filebeat on our system is configured to monitor System Logs on our 2 Web Server VMs.  According to Kibana documentation, this includes system logs, Linux Authorization logs, sudo logs, and details on creation of users and groups.
