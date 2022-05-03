@@ -7,11 +7,16 @@ The files in this repository were used to configure the network depicted below.
 
 ![Project Azure Resource Group Diagram](Diagrams/azure_resource_group.png)
 
-These files have been tested and used to generate a live ELK deployment on Azure. They can be used to either recreate the entire deployment pictured above. Alternatively, select portions of the file may be used to install only certain pieces of it, such as Filebeat.
-There are three Anisble playbooks used to install the ELK componets and components to monitor.
+These files have been tested and used to generate a live ELK deployment on Azure. They can be used to either recreate the entire deployment pictured above. 
+There are three Anisble playbooks used to install the ELK componets and the web server components to monitor.
 
-  - [Ansible/install_elk.yml](Ansible/install_elk.yml) - This playbook installs Docker and an ELK Docker container that opens ports 5601, 9200, and 5044 to accept calls from the web servers posting log and docker health data.  This playbook is published to ELK server: szemerf-elk.eastasia.cloudapp.azure.com.
-  - [Ansible/filebeat-playbook](Ansible/filebeat-playbook.yml) - This playbook installs Docker and an ELK Docker container that opens ports 5601, 9200, and 5044 to accept calls from the web servers posting log and docker health data.  This playbook is published to ELK server: szemerf-elk.eastasia.cloudapp.azure.com.
+___NOTE___: The Ansible scripts do not automatically provision the servers pictured above, they install the software components installed on the servers.
+
+  - [Ansible/pentest.yml](Ansible/pentest.yml) - This playbook installs Docker and an DVWA Docker container that opens ports 80 to accept This playbook is published to web servers: _Web1_ and _Web2_.
+  - [Ansible/install_elk.yml](Ansible/install_elk.yml) - This playbook installs Docker and an ELK Docker container that opens ports 5601, 9200, and 5044 to accept calls from the web servers posting log and docker health data.  This playbook is published to ELK server: _szemerf-elk.eastasia.cloudapp.azure.com_.
+  - [Ansible/filebeat-playbook](Ansible/filebeat-playbook.yml) - This playbook installs the components required to submit system logs from the web servers to the ELK server.  The playbook is published to the Web Servers: _Web1_ and _Web2_.
+  - [Ansible/metricbeat-playbook](Ansible/metricbeat-playbook.yml) - This playbook installs the components required to submit web server docker container health statistics from the web servers to the ELK server.  The playbook is published to the Web Servers: _Web1_ and _Web2_.
+
 
 This document contains the following details:
 - Description of the Topology
@@ -26,64 +31,66 @@ This document contains the following details:
 
 The main purpose of this network is to expose a load-balanced and monitored instance of DVWA, the D*mn Vulnerable Web Application.
 
-Load balancing ensures that the application will be highly _____, in addition to restricting _____ to the network.
-- _TODO: What aspect of security do load balancers protect? What is the advantage of a jump box?_
+Load balancing ensures that the application will be highly __available__, in addition to restricting __access__ to the network.
+- Load balancers distribute configure IP traffic to a pool of back-end servers, in this case, TCP traffic on port 80 is distributed between healthy servers in our back-end pool which consists of the two web servers.  A jump box is designed to allow SSH traffic from a specific network (or in our case, a specific IP address) to limit the number of servers exposed to internet SSH traffic, thus lowering exposure to our ELK and Web Servers from outside attacks.
 
-Integrating an ELK server allows users to easily monitor the vulnerable VMs for changes to the _____ and system _____.
-- _TODO: What does Filebeat watch for?_
-- _TODO: What does Metricbeat record?_
+Integrating an ELK server allows users to easily monitor the vulnerable VMs for changes to the __configuration__ and system __logs__.
+- Filebeat on our system is configured to monitor System Logs on our 2 Web Server VMs.  According to Kibana documentation, this includes system logs, Linux Authorization logs, sudo logs, and details on creation of users and groups.
+- Metricbeat collects Docker Container health statistics on the 2 Web servers.  According to Kibana documentation, this includes way too many things to list here, but highlights are: Container Size, Disk and I/O stats, CPU usage stats, Network access stats, and a general Overview of the Docker containers on the web servers.
 
 The configuration details of each machine may be found below.
 _Note: Use the [Markdown Table Generator](http://www.tablesgenerator.com/markdown_tables) to add/remove values from the table_.
 
-| Name     | Function | IP Address | Operating System |
-|----------|----------|------------|------------------|
-| Jump Box | Gateway  | 10.0.0.1   | Linux            |
-| TODO     |          |            |                  |
-| TODO     |          |            |                  |
-| TODO     |          |            |                  |
+| Name         | Function   | IP Address | Operating System     | Public IP Address | DNS Name                                                                    |
+|--------------|------------|------------|----------------------|-------------------|-----------------------------------------------------------------------------|
+| JumpBox      | Gateway    | 10.0.0.5   | Linux (Ubunto 20.04) | 20.213.157.2      | szemerf-jumpbox.australiaeast.cloudapp.azure.com                            |
+| ELK-Stack-VM | Monitoring | 10.1.0.4   | Linux (Ubunto 20.04) | 20.24.193.197     | szemerf-elk.eastasia.cloudapp.azure.com                                     |
+| Web1         | DVWA Node1 | 10.0.0.6   | Linux (Ubunto 20.04) | 20.47.123.3       | szemerf-web.australiaeast.cloudapp.azure.com (Via Load Balancer: RedTeamLB) |
+| Web2         | DVWA Node1 | 10.0.0.7   | Linux (Ubunto 20.04) | 20.47.123.3       | szemerf-web.australiaeast.cloudapp.azure.com (Via Load Balancer: RedTeamLB) |
 
 ### Access Policies
 
 The machines on the internal network are not exposed to the public Internet. 
 
-Only the _____ machine can accept connections from the Internet. Access to this machine is only allowed from the following IP addresses:
-- _TODO: Add whitelisted IP addresses_
+Only the __JumpBox__ machine can accept connections from the Internet. Access to this machine is only allowed from the following IP addresses:
+- My Personal IP address __(not disclosed here)__
 
-Machines within the network can only be accessed by _____.
+Machines within the network can only be accessed by __The Ansible Docker Container running on the JumpBox__.
 - _TODO: Which machine did you allow to access your ELK VM? What was its IP address?_
 
 A summary of the access policies in place can be found in the table below.
 
-| Name     | Publicly Accessible | Allowed IP Addresses |
-|----------|---------------------|----------------------|
-| Jump Box | Yes/No              | 10.0.0.1 10.0.0.2    |
-|          |                     |                      |
-|          |                     |                      |
+| Name         | Publicly Accessible | Allowed IP Addresses | Protocol/Ports/Service |
+|--------------|---------------------|----------------------|------------------------|
+| JumpBox      | Yes                 | My public IP Address | TCP/22/SSH             |
+| ELK-Stack-VM | Yes                 | My public IP Address | TCP/5601/HTTP          |
+| Web1         | Yes (Through LB)    | Any                  | TCP/80/HTTP            |
+| Web2         | Yes (Through LB)    | Any                  | TCP/80/HTTP            |
 
 ### Elk Configuration
 
 Ansible was used to automate configuration of the ELK machine. No configuration was performed manually, which is advantageous because...
-- _TODO: What is the main advantage of automating configuration with Ansible?_
+- Using Ansible allows a Dev/Ops team to configure one or many servers in a consistent manner.  Once a playbook is created and tested, it can be used again to deploy the playbook to new machines as they are provisioned, eliminating the risk of errors from manual configurations and code deployment.
 
 The playbook implements the following tasks:
-- _TODO: In 3-5 bullets, explain the steps of the ELK installation play. E.g., install Docker; download image; etc._
-- ...
-- ...
+- Set the Virtual Memory setting: vm.max_map_count to 262144 using the __sysctl__ command
+- Install Docker using the __apt__ command
+- Install the Python Package Manager (pip3) using the __apt__ command
+- Install the Docker Python Module using the __pip__ command
+- Download and Start the ELK Docker Container
 
 The following screenshot displays the result of running `docker ps` after successfully configuring the ELK instance.
 
-**Note**: The following image link needs to be updated. Replace `docker_ps_output.png` with the name of your screenshot image file.  
-
-
-![TODO: Update the path with the name of your screenshot of docker ps output](Images/docker_ps_output.png)
+![ELK_Docker_PS_Output.png](Images/ELK_Docker_PS_Output.png)
 
 ### Target Machines & Beats
 This ELK server is configured to monitor the following machines:
-- _TODO: List the IP addresses of the machines you are monitoring_
+- Web1 (10.0.0.6)
+- Web2 (10.0.0.7)
 
 We have installed the following Beats on these machines:
-- _TODO: Specify which Beats you successfully installed_
+- Filebeats   (to monitor system logs)
+- Metricbeats (to monitor Docker container stats)
 
 These Beats allow us to collect the following information from each machine:
 - _TODO: In 1-2 sentences, explain what kind of data each beat collects, and provide 1 example of what you expect to see. E.g., `Winlogbeat` collects Windows logs, which we use to track user logon events, etc._
