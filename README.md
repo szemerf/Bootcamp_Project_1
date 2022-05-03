@@ -7,12 +7,14 @@ The files in this repository were used to configure the network depicted below.
 
 ![Project Azure Resource Group Diagram](Diagrams/azure_resource_group.png)
 
-These files have been tested and used to generate a live ELK deployment on Azure. They can be used to either recreate the entire deployment pictured above. Alternatively, select portions of the _____ file may be used to install only certain pieces of it, such as Filebeat.
+These files have been tested and used to generate a live ELK deployment on Azure. They can be used to either recreate the entire deployment pictured above. Alternatively, select portions of the file may be used to install only certain pieces of it, such as Filebeat.
+There are three Anisble playbooks used to install the ELK componets and components to monitor.
 
-  - _TODO: Enter the playbook file._
+  - [Ansible/install_elk.yml](Ansible/install_elk.yml) - This playbook installs Docker and an ELK Docker container that opens ports 5601, 9200, and 5044 to accept calls from the web servers posting log and docker health data.  This playbook is published to ELK server: szemerf-elk.eastasia.cloudapp.azure.com.
+  - [Ansible/filebeat-playbook](Ansible/filebeat-playbook.yml) - This playbook installs Docker and an ELK Docker container that opens ports 5601, 9200, and 5044 to accept calls from the web servers posting log and docker health data.  This playbook is published to ELK server: szemerf-elk.eastasia.cloudapp.azure.com.
 
 This document contains the following details:
-- Description of the Topologu
+- Description of the Topology
 - Access Policies
 - ELK Configuration
   - Beats in Use
