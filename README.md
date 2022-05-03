@@ -52,7 +52,7 @@ _Note: Use the [Markdown Table Generator](http://www.tablesgenerator.com/markdow
 
 The machines on the internal network are not exposed to the public Internet. 
 
-Only the __JumpBox__ machine can accept connections from the Internet. Access to this machine is only allowed from the following IP addresses:
+Only the __JumpBox__ machine can accept SSH connections from the Internet. Access to this machine is only allowed from the following IP addresses:
 - My Personal IP address __(not disclosed here)__
 
 Machines within the network can only be accessed by __The Ansible Docker Container running on the JumpBox__.
@@ -93,19 +93,34 @@ We have installed the following Beats on these machines:
 - Metricbeats (to monitor Docker container stats)
 
 These Beats allow us to collect the following information from each machine:
-- _TODO: In 1-2 sentences, explain what kind of data each beat collects, and provide 1 example of what you expect to see. E.g., `Winlogbeat` collects Windows logs, which we use to track user logon events, etc._
+- Filebeats collects system logs, and sudo and access logs, as well as user and group creation.  For example, I created a new user (bob2) on Web1 and this is captured the Filebeat ECS.
+- Metricbeats collects statistics on the Docker containers running on the Web servers.  This can include CPU and Disk usage as well as network utilization.
+
+Examples of Logs and Metrics captured from the web servers:
+
+![Kibana_New_Users_Dashboard.png](Images/Kibana_New_Users_Dashboard.png)
+
+![Kibana_Docker_Stats_Dashboard.png](Images/Kibana_Docker_Stats_Dashboard.png)
 
 ### Using the Playbook
 In order to use the playbook, you will need to have an Ansible control node already configured. Assuming you have such a control node provisioned: 
 
 SSH into the control node and follow the steps below:
-- Copy the _____ file to _____.
-- Update the _____ file to include...
-- Run the playbook, and navigate to ____ to check that the installation worked as expected.
-
-_TODO: Answer the following questions to fill in the blanks:_
-- _Which file is the playbook? Where do you copy it?_
-- _Which file do you update to make Ansible run the playbook on a specific machine? How do I specify which machine to install the ELK server on versus which to install Filebeat on?_
-- _Which URL do you navigate to in order to check that the ELK server is running?
+- Copy the __install_elk.yml, metricbeat-playbook.yml and filebeat-playbook.yml__ files to __/etc/ansible/roles__.
+- Update the __/etc/ansible/hosts__ file to include sections defining __webservers__ and __elk__ servers and specify the python interpreter should be Python 3.
+- Run the playbook, and navigate to __http://{elk_server_ip}:5601__ to check that the installation worked as expected.
 
 _As a **Bonus**, provide the specific commands the user will need to run to download the playbook, update the files, etc._
+
+Commands to install ELK and load the Beats on Webservers
+
+First update /etc/ansible/hosts using nano or vi.
+
+`vi /etc/ansible/hosts`
+
+`ansible-playbook /etc/ansible/roles/install_elk.yml`
+
+`ansible-playbook /etc/ansible/roles/filebeat-playbook.yml`
+
+`ansible-playbook /etc/ansible/roles/metricbeat-playbook.yml`
+
