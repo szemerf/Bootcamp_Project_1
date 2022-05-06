@@ -12,7 +12,7 @@ There are three Anisble playbooks used to install the ELK componets and the web 
 
 ___NOTE___: The Ansible scripts do not automatically provision the servers pictured above, they install the software components installed on the servers.
 
-  - [Ansible/pentest.yml](Ansible/pentest.yml) - This playbook installs Docker and an DVWA Docker container that opens ports 80 to accept This playbook is published to web servers: _Web1_ and _Web2_.
+  - [Ansible/pentest.yml](Ansible/pentest.yml) - This playbook installs Docker and an DVWA Docker container that opens ports 80 to accept HTTP calls. This playbook is published to web servers: _Web1_ and _Web2_.
   - [Ansible/install_elk.yml](Ansible/install_elk.yml) - This playbook installs Docker and an ELK Docker container that opens ports 5601, 9200, and 5044 to accept calls from the web servers posting log and docker health data.  This playbook is published to ELK server: _szemerf-elk.eastasia.cloudapp.azure.com_.
   - [Ansible/filebeat-playbook](Ansible/filebeat-playbook.yml) - This playbook installs the components required to submit system logs from the web servers to the ELK server.  The playbook is published to the Web Servers: _Web1_ and _Web2_.
   - [Ansible/metricbeat-playbook](Ansible/metricbeat-playbook.yml) - This playbook installs the components required to submit web server docker container health statistics from the web servers to the ELK server.  The playbook is published to the Web Servers: _Web1_ and _Web2_.
